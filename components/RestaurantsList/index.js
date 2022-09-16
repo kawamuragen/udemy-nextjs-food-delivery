@@ -1,5 +1,5 @@
-import { Row, Col, Card, CardImg, CardBody, CardTitle } from "reactstrap";
 import Link from "next/link";
+import { Row, Col, Card, CardImg, CardBody, CardTitle } from "reactstrap";
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
 
@@ -17,32 +17,47 @@ const query = gql`
 `;
 
 // nafe
-const RestaurantList = () => {
+const RestaurantList = (props) => {
   const { loading, error, data } = useQuery(query);
   // console.log(data);
+
+  if (error) return "レストランの読み込みに失敗しました";
+
   if (loading) return <h2>ロード中・・・</h2>;
 
-  if (data.restaurants && data.restaurants.length) {
+  // レストランデータが取得できたらカードを表示
+  if (data) {
+    // 検索された文字列でfilterする
+    const searchQuery = data.restaurants.filter((res) =>
+      res.name.toLowerCase().includes(props.search)
+    );
+
     return (
       <Row>
-        <Col xs="6" sm="4">
-          <Card style={{ margin: "0 0.5rem 20px 0.5rem" }}>
-            <CardImg
-              src="http://localhost:1337/uploads/thumbnail_restaurant1_78f6738a9c.jpg"
-              top={true}
-              sytle={{ height: 250 }}
-            />
-            <CardBody>
-              <CardTitle>Italian restaurant</CardTitle>
-              <CardTitle>イタリアンのレストランです。</CardTitle>
-            </CardBody>
-            <div className="card-footer">
-              <Link href="/restaurants?id=1" as="/restaurants/1">
-                <a className="btn btn-primary">もっとみる</a>
-              </Link>
-            </div>
-          </Card>
-        </Col>
+        {searchQuery.map((restaurant) => (
+          <Col xs="6" sm="4" key={restaurant.id}>
+            <Card style={{ margin: "0 0.5rem 20px 0.5rem" }}>
+              <CardImg
+                src={`${process.env.NEXT_PUBLIC_API_URL}${restaurant.image[0].url}`}
+                top={true}
+                sytle={{ height: 250 }}
+              />
+              <CardBody>
+                <CardTitle>{restaurant.name}</CardTitle>
+                <CardTitle>{restaurant.description}</CardTitle>
+              </CardBody>
+              <div className="card-footer">
+                <Link
+                  href={`restaurants?id=${restaurant.id}`}
+                  as={`restaurants/${restaurant.id}`}
+                >
+                  <a className="btn btn-primary">もっとみる</a>
+                </Link>
+              </div>
+            </Card>
+          </Col>
+        ))}
+
         <style jsx>
           {`
             a {

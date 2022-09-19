@@ -1,11 +1,18 @@
-import React from "react";
-import App, { Container } from "next/app";
+import React, { useContext } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import { Container } from "next/app";
 import { Nav, NavItem } from "reactstrap";
+import Cookies from "js-cookie";
+
+import AppContext from "../context/AppContext";
 
 // nafe
 const Layout = (props) => {
+  const { user, setUser } = useContext(AppContext);
+  console.log("Layout.js user:");
+  console.log(user);
+
   return (
     <div>
       <Head>
@@ -30,14 +37,32 @@ const Layout = (props) => {
             </Link>
           </NavItem>
           <NavItem className="ml-auto">
-            <Link href="/login">
-              <a className="nav-link">サインイン</a>
-            </Link>
+            {user ? (
+              <Link href="/">
+                <a
+                  className="nav-link"
+                  onClick={() => {
+                    setUser(null);
+                    Cookies.remove("token");
+                  }}
+                >
+                  ログアウト
+                </a>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <a className="nav-link">ログイン</a>
+              </Link>
+            )}
           </NavItem>
           <NavItem>
-            <Link href="/register">
-              <a className="nav-link">サインアップ</a>
-            </Link>
+            {user ? (
+              <h5>{user.username}</h5>
+            ) : (
+              <Link href="/register">
+                <a className="nav-link">新規登録</a>
+              </Link>
+            )}
           </NavItem>
         </Nav>
       </header>

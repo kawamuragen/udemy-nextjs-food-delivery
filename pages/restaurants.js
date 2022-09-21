@@ -10,6 +10,7 @@ import {
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
 import { useRouter } from "next/router";
+import Cart from "../components/Cart";
 
 // どのレストラン情報を取るのか決めるために$idとする
 // ID! は必須小目
@@ -88,6 +89,11 @@ const Restaurants = (props) => {
               }
             `}
           </style>
+          <Col xs="3" style={{ padding: 0 }}>
+            <div>
+              <Cart />
+            </div>
+          </Col>
         </Row>
       </>
     );

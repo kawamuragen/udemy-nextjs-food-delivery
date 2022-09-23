@@ -45,7 +45,7 @@ const Restaurants = (props) => {
     // router→useRouter()  query.id→「?id=xxxx」
     variables: { id: router.query.id },
   });
-  console.log(data);
+  // console.log(data);
 
   if (error) return "レストランの読み込みに失敗しました";
 

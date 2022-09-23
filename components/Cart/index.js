@@ -28,10 +28,14 @@ const Cart = () => {
           </div>
           <div>
             {cart.items
-              ? cart.item.map((item) => {
+              ? cart.items.map((item) => {
                   if (item.quantity > 0) {
                     return (
-                      <div className="items-one" style={{ marginButtom: 15 }}>
+                      <div
+                        className="items-one"
+                        style={{ marginButtom: 15 }}
+                        key={item.id}
+                      >
                         <div>
                           <span id="item-price">&nbsp; {item.price}</span>
                           <span id="item-name">&nbsp; {item.name}</span>
@@ -45,8 +49,8 @@ const Cart = () => {
                               marginRight: 5,
                               marginLeft: 10,
                             }}
+                            onClick={() => appContext.addItem(item)}
                             color="link"
-                            onClick={() => appContext(item)}
                           >
                             +
                           </Button>
@@ -58,6 +62,7 @@ const Cart = () => {
                               marginRight: 5,
                               marginLeft: 10,
                             }}
+                            onClick={() => appContext.removeItem(item)}
                             color="link"
                           >
                             -

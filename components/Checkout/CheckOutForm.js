@@ -1,8 +1,48 @@
+import Cookies from "js-cookie";
 import { FormGroup, Input, Label } from "reactstrap";
+import { useContext, useState } from "react";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 
+import AppContext from "../../context/AppContext";
 import CardSection from "./CardSection";
 
 const CheckOutForm = () => {
+  const [data, setData] = useState({
+    address: "",
+    stripe_id: "",
+  });
+
+  const elemnts = useElements();
+  const stripe = useStripe();
+
+  // 住所フォームを入力された関数
+  const handleChange = (e) => {
+    // name="address" に入れていることを明示的に書いている
+    const updateItem = (data[e.target.name] = e.target.value);
+    setData({ ...data, updateItem });
+  };
+
+  // 注文を確定させる関数 submitOrder
+  const appContext = useContext(AppContext);
+  const userToken = Cookies.get("token");
+  const submitOrder = async () => {
+    const cardElement = elemnts.getElement(CardElement);
+    const token = await stripe.createToken(cardElement);
+
+    const response = await fetch(`${prosess.env.NEXT_PUBLIC_API_URL}/orders`, {
+      method: "POST",
+      headers: userToken && {
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        amount: Number(appContext.cart.total),
+        dishes: appContext.cart.items,
+        address: data.address,
+        token: token.token.id,
+      }),
+    });
+  };
+
   return (
     <div className="paper">
       <h5>あなたの情報</h5>
@@ -10,7 +50,7 @@ const CheckOutForm = () => {
       <FormGroup>
         <div>
           <Label>住所</Label>
-          <Input name="address" />
+          <Input name="address" onChange={(e) => handleChange()} />
         </div>
       </FormGroup>
 

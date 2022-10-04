@@ -11,6 +11,8 @@ const CheckOutForm = () => {
     address: "",
     stripe_id: "",
   });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const elemnts = useElements();
   const stripe = useStripe();
@@ -28,19 +30,29 @@ const CheckOutForm = () => {
   const submitOrder = async () => {
     const cardElement = elemnts.getElement(CardElement);
     const token = await stripe.createToken(cardElement);
+    console.log(token);
 
-    const response = await fetch(`${prosess.env.NEXT_PUBLIC_API_URL}/orders`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
       method: "POST",
       headers: userToken && {
         Authorization: `Bearer ${userToken}`,
       },
       body: JSON.stringify({
+        address: data.address,
         amount: Number(appContext.cart.total),
         dishes: appContext.cart.items,
-        address: data.address,
         token: token.token.id,
       }),
     });
+
+    if (response.ok) {
+      // console.log("注文に成功しました");
+      setSuccess("注文に成功しました");
+      console.log(appContext.cart.items);
+    } else {
+      // console.log("注文に失敗しました");
+      setError("注文に失敗しました");
+    }
   };
 
   return (
@@ -50,11 +62,15 @@ const CheckOutForm = () => {
       <FormGroup>
         <div>
           <Label>住所</Label>
-          <Input name="address" onChange={(e) => handleChange()} />
+          <Input name="address" onChange={(e) => handleChange(e)} />
         </div>
       </FormGroup>
 
-      <CardSection />
+      <CardSection
+        submitOrder={submitOrder}
+        errorMsg={error}
+        successMsg={success}
+      />
 
       <style jsx global>
         {`
